@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ТУТ — Карта встреч</title>
+    <!-- Подключаем API Яндекс.Карт. Код для Екб по умолчанию -->
+    <script src="https://yandex.ru" type="text/javascript"></script>
+    <style>
+        html, body, #map {
+            width: 100%; height: 100%; padding: 0; margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        /* Стили для всплывающего окна создания метки */
+        .custom-balloon {
+            padding: 10px;
+            max-width: 250px;
+        }
+        .custom-balloon h3 { margin: 0 0 10px 0; font-size: 16px; color: #333; }
+        .custom-balloon select, .custom-balloon input {
+            width: 100%; padding: 8px; margin-bottom: 8px;
+            border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;
+        }
+        .custom-balloon button {
+            width: 100%; padding: 10px; border: none; border-radius: 6px;
+            background: #2481cc; color: white; font-weight: bold; cursor: pointer;
+        }
+        .custom-balloon button:hover { background: #1a6fa8; }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <script type="text/javascript">
+        // Инициализация карты
+        ymaps.ready(init);
+        var myMap;
+
+        function init(){ 
+            // Центрируем карту на Екатеринбург (Плотинка / Набережная)
+            myMap = new ymaps.Map("map", {
+                center: [56.838926, 60.605702],
+                zoom: 14,
+                controls: ['zoomControl', 'geolocationControl']
+            });
+
+            // Слушаем клик по карте для создания новой метки
+            myMap.events.add('click', function (e) {
+                var coords = e.get('coords');
+                
+                // Открываем всплывающее окошко (балун) с параметрами
+                myMap.balloon.open(coords, {
+                    contentHeader: '📍 Создать инвайт тут?',
+                    contentBody: `
+                        <div class="custom-balloon">
+                            <input type="text" id="pin_desc" placeholder="Что будем делать? (например: кофе, бар)" max="150">
+                            <select id="pin_company">
+                                <option value="1">Нужен 1 человек</option>
+                                <option value="2">Нужно 2 человека</option>
+                                <option value="3">Ищу компанию (3+)</option>
+                            </select>
+                            <select id="pin_target">
+                                <option value="any">Ищу всех</option>
+                                <option value="male">Только парней</option>
+                                <option value="female">Только девушек</option>
+                            </select>
+                            <button onclick="savePin(${coords[0]}, ${coords[1]})">Создать точку</button>
+                        </div>
+                    `
+                });
+            });
+        }
+
+        // Функция отправки метки (В будущем сюда привяжем Supabase)
+        function savePin(lat, lon) {
+            var desc = document.getElementById('pin_desc').value;
+            var company = document.getElementById('pin_company').value;
+            var target = document.getElementById('pin_target').value;
+            
+            if(!desc) {
+                alert('Пожалуйста, напишите краткое описание встречи!');
+                return;
+            }
+
+            // Временное подтверждение для теста MVP
+            alert(`Точка создана успешно!\nКоординаты: ${lat}, ${lon}\nЧто делаем: ${desc}`);
+            myMap.balloon.close();
+
+            // Создаем визуальный маркер на карте
+            var myPlacemark = new ymaps.Placemark([lat, lon], {
+                balloonContent: `<b>Ищу компанию:</b> ${desc}<br><b>Кого:</b> ${target == 'any' ? 'Всех' : target}<br><a href="#" style="color:#2481cc;font-weight:bold;">Присоединиться в ТГ</a>`
+            }, {
+                preset: 'islands#violetIcon'
+            });
+            myMap.geoObjects.add(myPlacemark);
+        }
+    </script>
+</body>
+</html>
