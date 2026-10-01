@@ -4,75 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>ТУТ — Карта встреч</title>
-    <!-- Подключаем бесплатную карту Leaflet CSS и JS -->
     <link rel="stylesheet" href="https://unpkg.com" />
     <script src="https://unpkg.com"></script>
     <style>
-        html, body, #map {
-            width: 100%; height: 100%; padding: 0; margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-        }
-        .custom-balloon { padding: 10px; max-width: 230px; }
-        .custom-balloon input, .custom-balloon select {
-            width: 100%; padding: 8px; margin-bottom: 8px;
-            border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;
-        }
-        .custom-balloon button {
-            width: 100%; padding: 10px; border: none; border-radius: 6px;
-            background: #007bff; color: white; font-weight: bold; cursor: pointer;
-        }
+        html, body, #map { width: 100%; height: 100%; padding: 0; margin: 0; }
+        .custom-balloon { padding: 10px; max-width: 230px; font-family: sans-serif; }
+        .custom-balloon input { width: 100%; padding: 8px; margin-bottom: 8px; box-sizing: border-box; }
+        .custom-balloon button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 6px; font-weight: bold; }
     </style>
 </head>
 <body>
-
     <div id="map"></div>
-
     <script>
-        // Инициализируем карту Leaflet и центрируем на Екатеринбург (Плотинка)
         var map = L.map('map').setView([56.838926, 60.605702], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
-        // Загружаем бесплатные стильные слои карты
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        // Логика клика по карте для создания инвайта
         var popup = L.popup();
         map.on('click', function(e) {
             var lat = e.latlng.lat.toFixed(6);
             var lon = e.latlng.lng.toFixed(6);
-
-            popup
-                .setLatLng(e.latlng)
-                .setContent(`
-                    <div class="custom-balloon">
-                        <h4 style="margin:0 0 10px 0;">📍 Создать инвайт?</h4>
-                        <input type="text" id="pin_desc" placeholder="Что делаем? (Кафе, прогулка)" max="150">
-                        <select id="pin_company">
-                            <option value="1">Нужен 1 человек</option>
-                            <option value="2">Нужно 2 человека</option>
-                            <option value="3">Ищу компанию (3+)</option>
-                        </select>
-                        <button onclick="createMarker(${lat}, ${lon})">Создать точку</button>
-                    </div>
-                `)
-                .openOn(map);
+            popup.setLatLng(e.latlng).setContent(`
+                <div class="custom-balloon">
+                    <h4>📍 Создать инвайт?</h4>
+                    <input type="text" id="pin_desc" placeholder="Что делаем? (Кафе, бар)">
+                    <button onclick="createMarker(${lat}, ${lon})">Создать точку</button>
+                </div>
+            `).openOn(map);
         });
 
-        // Функция установки маркера на карту
         function createMarker(lat, lon) {
             var desc = document.getElementById('pin_desc').value;
-            if (!desc) {
-                alert('Напишите, чем займетесь!');
-                return;
-            }
-
-            // Создаем маркер синего цвета на карте
-            L.marker([lat, lon]).addTo(map)
-                .bindPopup(`<b>Ищу компанию:</b> ${desc}<br><br><a href="#" style="color:#007bff;font-weight:bold;">Присоединиться</a>`)
-                .openPopup();
-
+            if (!desc) return alert('Напишите описание!');
+            L.marker([lat, lon]).addTo(map).bindPopup(`<b>Ищу компанию:</b> ${desc}`).openPopup();
             map.closePopup();
         }
     </script>
