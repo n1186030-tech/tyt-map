@@ -4,48 +4,25 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>ТЕСТ КАРТЫ</title>
-    <!-- Подключаем стили и скрипты карты Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com" />
-    <script src="https://unpkg.com"></script>
     <style>
-        /* Жестко прописываем высоту на 100%, чтобы убрать белый экран */
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
+            overflow: hidden;
         }
-        #map {
+        /* Карта откроется на весь экран смартфона и ПК */
+        iframe {
             width: 100vw;
             height: 100vh;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            border: none;
         }
     </style>
 </head>
 <body>
 
-    <div id="map"></div>
+    <!-- Подключаем официальный, стабильный слой Яндекс.Карт по Екатеринбургу -->
+    <iframe src="https://yandex.ru"></iframe>
 
-    <script>
-        // Создаем карту и центрируем на Плотинку в Екатеринбурге
-        var map = L.map('map', {
-            zoomControl: true,
-            layers: []
-        }).setView([56.838926, 60.605702], 14);
-        
-        // Загружаем бесплатную карту мира OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        // Ставим тестовую синюю метку в Екб
-        L.marker([56.838926, 60.605702]).addTo(map)
-            .bindPopup('<b>ТУТ!</b><br>Интерактивная карта работает успешно.')
-            .openPopup();
-    </script>
 </body>
 </html>
